@@ -248,6 +248,7 @@ public class AccountRestService {
         representation.setDescription(model.getDescription());
         representation.setUserConsentRequired(model.isConsentRequired());
         representation.setInUse(inUseClients.contains(model.getClientId()));
+        representation.setAlwaysDisplayInConsole(model.isAlwaysDisplayInConsole());
         representation.setOfflineAccess(offlineClients.contains(model.getClientId()));
         representation.setRootUrl(model.getRootUrl());
         representation.setBaseUrl(model.getBaseUrl());
@@ -480,6 +481,7 @@ public class AccountRestService {
 
         return clients.stream().filter(client -> !client.isBearerOnly() && !client.getClientId().isEmpty())
                 .filter(client -> matches(client, name))
+                .filter(client -> auth.getUser().getClientRoleMappingsStream(client).anyMatch(role -> role.getName().equals("allow-access")))
                 .map(client -> modelToRepresentation(client, inUseClients, offlineClients, consentModels));
     }
 
